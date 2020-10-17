@@ -1,5 +1,10 @@
 import * as core from '@actions/core';
+import sevenBin from '7zip-bin';
+import Seven from 'node-7z';
 import {wait} from './wait'
+
+import {createRelease} from './create-release';
+import { create } from 'domain';
 
 async function run(): Promise<void> {
   try {
@@ -11,14 +16,29 @@ async function run(): Promise<void> {
     const bookName: string = core.getInput('bookname');
     const languageId: string = core.getInput('languageid');
 
+    // setup 7zip
+    const pathTo7zip = sevenBin.path7za;
+    const bookDirectoryContent: string = bookDirectory+'/content/';
+    const bookDirectoryData: string = bookDirectory+'/_data/';
+    const bookDirectoryConfig: string = bookDirectory+'_config.yml';
+
     // zip
-    
+    const zipStream = Seven.add('jupyterbook.zip', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
+      recursive: true,
+      $bin: pathTo7zip
+    });
 
     // tar
+    const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
+      recursive: true,
+      $bin: pathTo7zip
+    });
 
     // get datestring
 
     // create release
+    // https://github.com/actions/create-release
+    createRelease();
 
     // upload zip
 

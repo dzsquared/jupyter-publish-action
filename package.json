@@ -25,7 +25,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.6"
+    "7zip-bin": "^5.0.3",
+    "@actions/core": "^1.2.6",
+    "node-7z": "^2.1.2"
   },
   "devDependencies": {
     "@types/jest": "^26.0.10",
