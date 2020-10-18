@@ -1,11 +1,28 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Remote Jupyter Book Publish'
+description: 'Publishes a remote book for Azure Data Studio from a Jupyter book'
+author: 'Drew Skwiers-Koballa'
 inputs:
-  milliseconds: # change this
+  # milliseconds: # change this
+  #   required: true
+  #   description: 'input description here'
+  #   default: 'default value if applicable'
+  directory:
+    description: 'Jupyter Book to Release (defaults to whole repository)'
+    default: '.'
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  releasename:
+    description: 'Release name'
+    required: true
+  bookname:
+    description: 'Book name'
+    required: true
+  versionnumber:
+    description: 'Version number'
+    required: true
+  languageid:
+    description: 'Language id'
+    default: 'EN'
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'
