@@ -2,7 +2,8 @@ const core = require('@actions/core');
 const { GitHub, context } = require('@actions/github');
 const fs = require('fs');
 
-export async function createRelease() {
+
+export async function createRelease( tagName: string, release_name: string ): Promise<releaseInfo|undefined> {
   try {
     // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
     const github = new GitHub(process.env.GITHUB_TOKEN);
@@ -11,19 +12,19 @@ export async function createRelease() {
     const { owner: currentOwner, repo: currentRepo } = context.repo;
 
     // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-    const tagName = core.getInput('tag_name', { required: true });
+    // const tagName = core.getInput('tag_name', { required: true });
 
     // This removes the 'refs/tags' portion of the string, i.e. from 'refs/tags/v1.10.15' to 'v1.10.15'
-    const tag = tagName.replace('refs/tags/', '');
-    const releaseName = core.getInput('release_name', { required: false }).replace('refs/tags/', '');
-    const body = core.getInput('body', { required: false });
-    const draft = core.getInput('draft', { required: false }) === 'true';
-    const prerelease = core.getInput('prerelease', { required: false }) === 'true';
-    const commitish = core.getInput('commitish', { required: false }) || context.sha;
+    const tag: string = tagName.replace('refs/tags/', '');
+    const releaseName: string = release_name.replace('refs/tags/', '');
+    const body: string = "";
+    const draft: boolean = false;
+    const prerelease: boolean = false;
+    const commitish = context.sha;
 
-    const bodyPath = core.getInput('body_path', { required: false });
-    const owner = core.getInput('owner', { required: false }) || currentOwner;
-    const repo = core.getInput('repo', { required: false }) || currentRepo;
+    const bodyPath = "";
+    const owner = currentOwner;
+    const repo = currentRepo;
     let bodyFileContent = null;
     if (bodyPath !== '' && !!bodyPath) {
       try {
@@ -52,11 +53,30 @@ export async function createRelease() {
       data: { id: releaseId, html_url: htmlUrl, upload_url: uploadUrl }
     } = createReleaseResponse;
 
+    let releaseReturn = new releaseInfo(releaseId, htmlUrl, uploadUrl);
+    return new Promise<releaseInfo>((resolve) => {
+      resolve(releaseReturn);
+    });
+
     // Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-    core.setOutput('id', releaseId);
-    core.setOutput('html_url', htmlUrl);
-    core.setOutput('upload_url', uploadUrl);
-  } catch (error) {
+    // core.setOutput('id', releaseId);
+    // core.setOutput('html_url', htmlUrl);
+    // core.setOutput('upload_url', uploadUrl);
+   
+  } catch (error)  {
     core.setFailed(error.message);
+    // return undefined;
+  }
+}
+
+export class releaseInfo {
+  public releaseId: string;
+  public htmlUrl: string;
+  public uploadUrl: string;
+
+  constructor( releaseId: string, htmlUrl: string, uploadUrl: string ) {
+    this.releaseId = releaseId;
+    this.htmlUrl = htmlUrl;
+    this.uploadUrl = uploadUrl;
   }
 }

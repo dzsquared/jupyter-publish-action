@@ -3,7 +3,8 @@ import sevenBin from '7zip-bin';
 import Seven from 'node-7z';
 import {wait} from './wait'
 
-import {createRelease} from './create-release';
+import {createRelease, releaseInfo} from './create-release';
+import {uploadReleaseAsset} from './upload-release-asset';
 import { create } from 'domain';
 
 async function run(): Promise<void> {
@@ -12,9 +13,10 @@ async function run(): Promise<void> {
     core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
 
     const bookDirectory: string = core.getInput('directory');
-    const releaseName: string = core.getInput('releasename');
     const bookName: string = core.getInput('bookname');
+    const versionNumber: string = core.getInput('versionnumber');
     const languageId: string = core.getInput('languageid');
+    const releaseName = core.getInput('release_name', { required: true });
 
     // setup 7zip
     const pathTo7zip = sevenBin.path7za;
@@ -35,21 +37,29 @@ async function run(): Promise<void> {
     });
 
     // get datestring
+    const tagName: string = new Date().toISOString();
 
     // create release
     // https://github.com/actions/create-release
-    createRelease();
+    let newRelease = await createRelease(tagName, releaseName);
+    if (newRelease) {
+      let uploadUrl = newRelease.uploadUrl;
 
-    // upload zip
+      // upload zip
+      const zipFile = bookDirectory + 'jupyterbook.zip';
+      const zipName = bookName + '-' + versionNumber + '-' + languageId + '.zip';
+      await uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip');
 
-    // upload tar
+      // upload tar
+      const tarFile = bookDirectory + 'jupyterbook.tar.gz';
+      const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
+      await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar');
 
-
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+      core.setOutput('releaseUrl',newRelease.htmlUrl);
+    } else {
+      core.error('Failed to create release.');
+      core.setFailed('Failed to create release.')
+    }
   } catch (error) {
     core.setFailed(error.message)
   }
