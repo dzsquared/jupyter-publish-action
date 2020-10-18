@@ -1,7 +1,6 @@
 import * as core from '@actions/core';
 import sevenBin from '7zip-bin';
 import Seven from 'node-7z';
-import {wait} from './wait'
 
 import {createRelease, releaseInfo} from './create-release';
 import {uploadReleaseAsset} from './upload-release-asset';
