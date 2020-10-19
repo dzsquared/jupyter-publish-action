@@ -4,18 +4,14 @@ import Seven from 'node-7z';
 
 import {createRelease, releaseInfo} from './create-release';
 import {uploadReleaseAsset} from './upload-release-asset';
-import { create } from 'domain';
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-
     const bookDirectory: string = core.getInput('directory');
     const bookName: string = core.getInput('bookname');
     const versionNumber: string = core.getInput('versionnumber');
     const languageId: string = core.getInput('languageid');
-    const releaseName = core.getInput('release_name', { required: true });
+    const releaseName = core.getInput('releasename', { required: true });
 
     // setup 7zip
     const pathTo7zip = sevenBin.path7za;

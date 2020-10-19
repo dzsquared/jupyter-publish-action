@@ -1745,13 +1745,11 @@ const upload_release_asset_1 = __webpack_require__(307);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const ms = core.getInput('milliseconds');
-            core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
             const bookDirectory = core.getInput('directory');
             const bookName = core.getInput('bookname');
             const versionNumber = core.getInput('versionnumber');
             const languageId = core.getInput('languageid');
-            const releaseName = core.getInput('release_name', { required: true });
+            const releaseName = core.getInput('releasename', { required: true });
             // setup 7zip
             const pathTo7zip = _7zip_bin_1.default.path7za;
             const bookDirectoryContent = bookDirectory + '/content/';
