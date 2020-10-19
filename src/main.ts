@@ -23,36 +23,25 @@ async function run(): Promise<void> {
     core.setOutput('7zipPath', pathTo7zip);
     console.log('7zip path: ' + pathTo7zip);
     // zip
-    const zipStream = Seven.add('jupyterbook.zip', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
+    const zipStream = Seven.add('jupyterbook.zip', '*', { //[bookDirectoryContent,bookDirectoryData,bookDirectoryConfig]
       recursive: true
-      // ,
+      , excludeArchiveType : 'zip'
       // $bin: pathTo7zip
     });
-    zipStream.on('data', function (data: any) {
-      console.log(data)
-      // {
-      //   file: 'path/of/the/file/in/the/archive',
-      //   status: 'renamed|tested|updated|skipped|deleted|extracted',
-      //   attributes: '....A', size: 9, sizeCompressed: 3, (only list command)
-      //   hash: 'FEDC304F', size: 9 (only hash command)
-      // }
-    });
+    // zipStream.on('data', function (data: any) {
+    //   console.log(data)
+    // });
+    console.log('zipped');
 
     // tar
     const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
       recursive: true
-      // ,
+      , excludeArchiveType : 'tar'
       // $bin: pathTo7zip
     });
-    tarStream.on('data', function (data: any) {
-      console.log(data)
-      // {
-      //   file: 'path/of/the/file/in/the/archive',
-      //   status: 'renamed|tested|updated|skipped|deleted|extracted',
-      //   attributes: '....A', size: 9, sizeCompressed: 3, (only list command)
-      //   hash: 'FEDC304F', size: 9 (only hash command)
-      // }
-    });
+    // tarStream.on('data', function (data: any) {
+    //   console.log(data)
+    // });
 
     // get datestring
     const tagName: string = new Date().toISOString();
