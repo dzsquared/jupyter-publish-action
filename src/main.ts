@@ -65,12 +65,12 @@ async function run(): Promise<void> {
       let uploadUrl = newRelease.uploadUrl;
 
       // upload zip
-      const zipFile = bookDirectory + 'jupyterbook.zip';
+      const zipFile = bookDirectory + '/jupyterbook.zip';
       const zipName = bookName + '-' + versionNumber + '-' + languageId + '.zip';
       await uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip', newRelease.releaseId, gitHubToken);
 
       // upload tar
-      // const tarFile = bookDirectory + 'jupyterbook.tar.gz';
+      // const tarFile = bookDirectory + '/jupyterbook.tar.gz';
       // const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
       // await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
 
