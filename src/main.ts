@@ -54,7 +54,7 @@ async function run(): Promise<void> {
     // });
 
     // get datestring
-    const tagName: string = new Date().toISOString();
+    const tagName: string = new Date().toISOString().replace(/[.Z:-]/g, '');
     console.log(tagName);
 
     // create release

@@ -1787,7 +1787,7 @@ function run() {
             //   console.log(data)
             // });
             // get datestring
-            const tagName = new Date().toISOString();
+            const tagName = new Date().toISOString().replace(/[.Z:-]/g, '');
             console.log(tagName);
             // create release
             // https://github.com/actions/create-release
