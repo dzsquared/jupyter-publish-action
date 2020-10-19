@@ -1752,7 +1752,7 @@ function run() {
             const releaseName = core.getInput('releasename', { required: true });
             const gitHubToken = core.getInput('githubtoken', { required: true });
             // setup 7zip
-            const pathTo7zip = _7zip_bin_1.default.path7za;
+            const pathTo7zip = _7zip_bin_1.default.path7za.replace('\\', '/');
             const bookDirectoryContent = bookDirectory + '/content/';
             const bookDirectoryData = bookDirectory + '/_data/';
             const bookDirectoryConfig = bookDirectory + '_config.yml';
