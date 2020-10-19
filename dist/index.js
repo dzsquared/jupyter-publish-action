@@ -1770,6 +1770,7 @@ function run() {
                         resolve();
                     });
                     zipStream.on('error', (err) => {
+                        console.log(err);
                         reject(err.stderr);
                     });
                 });
@@ -1787,9 +1788,11 @@ function run() {
             // });
             // get datestring
             const tagName = new Date().toISOString();
+            console.log(tagName);
             // create release
             // https://github.com/actions/create-release
             let newRelease = yield create_release_1.createRelease(tagName, releaseName, gitHubToken);
+            console.log(newRelease);
             if (newRelease) {
                 let uploadUrl = newRelease.uploadUrl;
                 // upload zip

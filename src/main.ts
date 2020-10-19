@@ -35,6 +35,7 @@ async function run(): Promise<void> {
           resolve();
         });
         zipStream.on('error', (err: any) => {
+          console.log(err);
           reject(err.stderr);
         })
       })
@@ -54,10 +55,12 @@ async function run(): Promise<void> {
 
     // get datestring
     const tagName: string = new Date().toISOString();
+    console.log(tagName);
 
     // create release
     // https://github.com/actions/create-release
     let newRelease = await createRelease(tagName, releaseName, gitHubToken);
+    console.log(newRelease);
     if (newRelease) {
       let uploadUrl = newRelease.uploadUrl;
 
