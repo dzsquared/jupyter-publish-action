@@ -15,7 +15,7 @@ async function run(): Promise<void> {
     const gitHubToken: string  = core.getInput('githubtoken', { required: true });
 
     // setup 7zip
-    const pathTo7zip = sevenBin.path7za.replace('\\','/');
+    const pathTo7zip = sevenBin.path7za.replace(/\\/g,'/');
     const bookDirectoryContent: string = bookDirectory+'/content/';
     const bookDirectoryData: string = bookDirectory+'/_data/';
     const bookDirectoryConfig: string = bookDirectory+'_config.yml';
