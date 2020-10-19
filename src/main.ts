@@ -28,17 +28,17 @@ async function run(): Promise<void> {
       , excludeArchiveType : 'zip'
       // $bin: pathTo7zip
     });
-    // zipStream.on('data', function (data: any) {
-    //   console.log(data)
-    // });
+    zipStream.on('data', function (data: any) {
+      console.log(data)
+    });
     console.log('zipped');
 
     // tar
-    const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
-      recursive: true
-      , excludeArchiveType : 'tar'
-      // $bin: pathTo7zip
-    });
+    // const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
+    //   recursive: true
+    //   , excludeArchiveType : 'tar'
+    //   // $bin: pathTo7zip
+    // });
     // tarStream.on('data', function (data: any) {
     //   console.log(data)
     // });
@@ -58,9 +58,9 @@ async function run(): Promise<void> {
       await uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip', newRelease.releaseId, gitHubToken);
 
       // upload tar
-      const tarFile = bookDirectory + 'jupyterbook.tar.gz';
-      const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
-      await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
+      // const tarFile = bookDirectory + 'jupyterbook.tar.gz';
+      // const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
+      // await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
 
       core.setOutput('releaseUrl',newRelease.htmlUrl);
     } else {
