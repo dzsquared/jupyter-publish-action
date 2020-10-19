@@ -8732,8 +8732,11 @@ function createRelease(tagName, release_name, gitHubToken) {
             // core.setOutput('upload_url', uploadUrl);
         }
         catch (error) {
-            core_1.default.setFailed(error.message);
             // return undefined;
+            return new Promise((reject) => {
+                reject(error.message);
+            });
+            core_1.default.setFailed(error.message);
         }
     });
 }

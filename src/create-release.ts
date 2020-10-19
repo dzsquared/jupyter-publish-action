@@ -1,9 +1,10 @@
 import core from '@actions/core';
 import * as github from '@actions/github'; 
+import { rejects } from 'assert';
 import fs from 'fs';
 
 
-export async function createRelease( tagName: string, release_name: string, gitHubToken: string ): Promise<releaseInfo|undefined> {
+export async function createRelease( tagName: string, release_name: string, gitHubToken: string ): Promise<releaseInfo> {
   try {
     // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
     // const github = new GitHub(process.env.GITHUB_TOKEN);
@@ -65,8 +66,11 @@ export async function createRelease( tagName: string, release_name: string, gitH
     // core.setOutput('upload_url', uploadUrl);
    
   } catch (error)  {
-    core.setFailed(error.message);
     // return undefined;
+    return new Promise<releaseInfo>((reject) => {
+      reject(error.message);
+    });
+    core.setFailed(error.message);
   }
 }
 
