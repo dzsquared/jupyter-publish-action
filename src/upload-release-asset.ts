@@ -38,6 +38,7 @@ export async function uploadReleaseAsset(uploadUrl: string, assetPath: string, a
     // Set the output variable for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
     //core.setOutput('browser_download_url', browserDownloadUrl);
   } catch (error) {
+    console.log(error.message);
     core.setFailed(error.message);
   }
 }

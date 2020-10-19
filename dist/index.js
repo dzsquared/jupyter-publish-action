@@ -4306,6 +4306,7 @@ function uploadReleaseAsset(uploadUrl, assetPath, assetName, assetContentType, r
             //core.setOutput('browser_download_url', browserDownloadUrl);
         }
         catch (error) {
+            console.log(error.message);
             core_1.default.setFailed(error.message);
         }
     });
