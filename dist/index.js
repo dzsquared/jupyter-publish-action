@@ -1750,6 +1750,7 @@ function run() {
             const versionNumber = core.getInput('versionnumber');
             const languageId = core.getInput('languageid');
             const releaseName = core.getInput('releasename', { required: true });
+            const gitHubToken = core.getInput('githubtoken', { required: true });
             // setup 7zip
             const pathTo7zip = _7zip_bin_1.default.path7za;
             const bookDirectoryContent = bookDirectory + '/content/';
@@ -1769,17 +1770,17 @@ function run() {
             const tagName = new Date().toISOString();
             // create release
             // https://github.com/actions/create-release
-            let newRelease = yield create_release_1.createRelease(tagName, releaseName);
+            let newRelease = yield create_release_1.createRelease(tagName, releaseName, gitHubToken);
             if (newRelease) {
                 let uploadUrl = newRelease.uploadUrl;
                 // upload zip
                 const zipFile = bookDirectory + 'jupyterbook.zip';
                 const zipName = bookName + '-' + versionNumber + '-' + languageId + '.zip';
-                yield upload_release_asset_1.uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip');
+                yield upload_release_asset_1.uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip', newRelease.releaseId, gitHubToken);
                 // upload tar
                 const tarFile = bookDirectory + 'jupyterbook.tar.gz';
                 const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
-                yield upload_release_asset_1.uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar');
+                yield upload_release_asset_1.uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
                 core.setOutput('releaseUrl', newRelease.htmlUrl);
             }
             else {
@@ -4216,6 +4217,25 @@ module.exports.default = pathKey;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -4225,28 +4245,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadReleaseAsset = void 0;
-const core = __webpack_require__(186);
-const { GitHub } = __webpack_require__(438);
-const fs = __webpack_require__(747);
-function uploadReleaseAsset(uploadUrl, assetPath, assetName, assetContentType) {
+const core_1 = __importDefault(__webpack_require__(186));
+const github = __importStar(__webpack_require__(438));
+const fs_1 = __importDefault(__webpack_require__(747));
+function uploadReleaseAsset(uploadUrl, assetPath, assetName, assetContentType, releaseId, gitHubToken) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-            const github = new GitHub(process.env.GITHUB_TOKEN);
+            // const github = new GitHub(process.env.GITHUB_TOKEN);
+            const octokit = github.getOctokit(gitHubToken);
+            const { owner: currentOwner, repo: currentRepo } = github.context.repo;
+            const owner = currentOwner;
+            const repo = currentRepo;
             // Determine content-length for header to upload asset
-            const contentLength = (filePath) => fs.statSync(filePath).size;
+            const contentLength = (filePath) => fs_1.default.statSync(filePath).size;
             // Setup headers for API call, see Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset for more information
             const headers = { 'content-type': assetContentType, 'content-length': contentLength(assetPath) };
             // Upload a release asset
             // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
             // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
-            const uploadAssetResponse = yield github.repos.uploadReleaseAsset({
-                url: uploadUrl,
+            const uploadAssetResponse = yield octokit.repos.uploadReleaseAsset({
+                data: fs_1.default.readFileSync(assetPath),
                 headers,
                 name: assetName,
-                file: fs.readFileSync(assetPath)
+                url: uploadUrl,
+                owner: currentOwner,
+                repo: currentRepo,
+                release_id: releaseId
             });
             // Get the browser_download_url for the uploaded release asset from the response
             const { data: { browser_download_url: browserDownloadUrl } } = uploadAssetResponse;
@@ -4254,7 +4284,7 @@ function uploadReleaseAsset(uploadUrl, assetPath, assetName, assetContentType) {
             //core.setOutput('browser_download_url', browserDownloadUrl);
         }
         catch (error) {
-            core.setFailed(error.message);
+            core_1.default.setFailed(error.message);
         }
     });
 }
@@ -8590,6 +8620,25 @@ function register (state, name, method, options) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8599,18 +8648,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.releaseInfo = exports.createRelease = void 0;
-const core = __webpack_require__(186);
-const { GitHub, context } = __webpack_require__(438);
-const fs = __webpack_require__(747);
-function createRelease(tagName, release_name) {
+const core_1 = __importDefault(__webpack_require__(186));
+const github = __importStar(__webpack_require__(438));
+const fs_1 = __importDefault(__webpack_require__(747));
+function createRelease(tagName, release_name, gitHubToken) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-            const github = new GitHub(process.env.GITHUB_TOKEN);
+            // const github = new GitHub(process.env.GITHUB_TOKEN);
             // Get owner and repo from context of payload that triggered the action
-            const { owner: currentOwner, repo: currentRepo } = context.repo;
+            const { owner: currentOwner, repo: currentRepo } = github.context.repo;
+            const octokit = github.getOctokit(gitHubToken);
             // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
             // const tagName = core.getInput('tag_name', { required: true });
             // This removes the 'refs/tags' portion of the string, i.e. from 'refs/tags/v1.10.15' to 'v1.10.15'
@@ -8619,23 +8672,23 @@ function createRelease(tagName, release_name) {
             const body = "";
             const draft = false;
             const prerelease = false;
-            const commitish = context.sha;
+            const commitish = github.context.sha;
             const bodyPath = "";
             const owner = currentOwner;
             const repo = currentRepo;
             let bodyFileContent = null;
             if (bodyPath !== '' && !!bodyPath) {
                 try {
-                    bodyFileContent = fs.readFileSync(bodyPath, { encoding: 'utf8' });
+                    bodyFileContent = fs_1.default.readFileSync(bodyPath, { encoding: 'utf8' });
                 }
                 catch (error) {
-                    core.setFailed(error.message);
+                    core_1.default.setFailed(error.message);
                 }
             }
             // Create a release
             // API Documentation: https://developer.github.com/v3/repos/releases/#create-a-release
             // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-create-release
-            const createReleaseResponse = yield github.repos.createRelease({
+            const createReleaseResponse = yield octokit.repos.createRelease({
                 owner,
                 repo,
                 tag_name: tag,
@@ -8657,7 +8710,7 @@ function createRelease(tagName, release_name) {
             // core.setOutput('upload_url', uploadUrl);
         }
         catch (error) {
-            core.setFailed(error.message);
+            core_1.default.setFailed(error.message);
             // return undefined;
         }
     });
