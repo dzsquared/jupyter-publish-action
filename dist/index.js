@@ -1760,8 +1760,9 @@ function run() {
             console.log('7zip path: ' + pathTo7zip);
             // zip
             const zipStream = node_7z_1.default.add('jupyterbook.zip', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
-                recursive: true,
-                $bin: pathTo7zip
+                recursive: true
+                // ,
+                // $bin: pathTo7zip
             });
             zipStream.on('data', function (data) {
                 console.log(data);
@@ -1774,8 +1775,9 @@ function run() {
             });
             // tar
             const tarStream = node_7z_1.default.add('jupyterbook.tar.gz', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
-                recursive: true,
-                $bin: pathTo7zip
+                recursive: true
+                // ,
+                // $bin: pathTo7zip
             });
             tarStream.on('data', function (data) {
                 console.log(data);

@@ -24,8 +24,9 @@ async function run(): Promise<void> {
     console.log('7zip path: ' + pathTo7zip);
     // zip
     const zipStream = Seven.add('jupyterbook.zip', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
-      recursive: true,
-      $bin: pathTo7zip
+      recursive: true
+      // ,
+      // $bin: pathTo7zip
     });
     zipStream.on('data', function (data: any) {
       console.log(data)
@@ -39,8 +40,9 @@ async function run(): Promise<void> {
 
     // tar
     const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
-      recursive: true,
-      $bin: pathTo7zip
+      recursive: true
+      // ,
+      // $bin: pathTo7zip
     });
     tarStream.on('data', function (data: any) {
       console.log(data)
