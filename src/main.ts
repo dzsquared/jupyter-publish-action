@@ -20,17 +20,26 @@ async function run(): Promise<void> {
     const bookDirectoryData: string = bookDirectory+'/_data/';
     const bookDirectoryConfig: string = bookDirectory+'_config.yml';
 
-    core.setOutput('7zipPath', pathTo7zip);
-    console.log('7zip path: ' + pathTo7zip);
-    // zip
-    const zipStream = Seven.add('jupyterbook.zip', '*', { //[bookDirectoryContent,bookDirectoryData,bookDirectoryConfig]
-      recursive: true
-      , excludeArchiveType : 'zip'
-      // $bin: pathTo7zip
-    });
-    zipStream.on('data', function (data: any) {
-      console.log(data)
-    });
+    // core.setOutput('7zipPath', pathTo7zip);
+    // console.log('7zip path: ' + pathTo7zip);
+    console.log(bookDirectoryContent);
+    const createZip = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
+      const zipStream = Seven.add('jupyterbook.zip', '*', { //[bookDirectoryContent,bookDirectoryData,bookDirectoryConfig]
+        recursive: true
+        , excludeArchiveType : 'zip'
+        // $bin: pathTo7zip
+      });
+      
+      await new Promise((resolve, reject) => {
+        zipStream.on('end', () => {
+          resolve();
+        });
+        zipStream.on('error', (err: any) => {
+          reject(err.stderr);
+        })
+      })
+    };
+    await createZip(bookDirectoryContent,bookDirectoryData,bookDirectoryConfig);
     console.log('zipped');
 
     // tar

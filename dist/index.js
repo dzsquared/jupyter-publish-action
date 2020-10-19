@@ -1756,17 +1756,25 @@ function run() {
             const bookDirectoryContent = bookDirectory + '/content/';
             const bookDirectoryData = bookDirectory + '/_data/';
             const bookDirectoryConfig = bookDirectory + '_config.yml';
-            core.setOutput('7zipPath', pathTo7zip);
-            console.log('7zip path: ' + pathTo7zip);
-            // zip
-            const zipStream = node_7z_1.default.add('jupyterbook.zip', '*', {
-                recursive: true,
-                excludeArchiveType: 'zip'
-                // $bin: pathTo7zip
+            // core.setOutput('7zipPath', pathTo7zip);
+            // console.log('7zip path: ' + pathTo7zip);
+            console.log(bookDirectoryContent);
+            const createZip = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
+                const zipStream = node_7z_1.default.add('jupyterbook.zip', '*', {
+                    recursive: true,
+                    excludeArchiveType: 'zip'
+                    // $bin: pathTo7zip
+                });
+                yield new Promise((resolve, reject) => {
+                    zipStream.on('end', () => {
+                        resolve();
+                    });
+                    zipStream.on('error', (err) => {
+                        reject(err.stderr);
+                    });
+                });
             });
-            zipStream.on('data', function (data) {
-                console.log(data);
-            });
+            yield createZip(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
             console.log('zipped');
             // tar
             // const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
