@@ -1,11 +1,15 @@
-const core = require('@actions/core');
-const { GitHub } = require('@actions/github');
-const fs = require('fs');
+import core from '@actions/core';
+import * as github from '@actions/github';
+import fs from 'fs';
 
-export async function uploadReleaseAsset(uploadUrl: string, assetPath: string, assetName: string, assetContentType: string) {
+export async function uploadReleaseAsset(uploadUrl: string, assetPath: string, assetName: string, assetContentType: string, releaseId: number, gitHubToken: string) {
   try {
     // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-    const github = new GitHub(process.env.GITHUB_TOKEN);
+    // const github = new GitHub(process.env.GITHUB_TOKEN);
+    const octokit = github.getOctokit(gitHubToken);
+    const { owner: currentOwner, repo: currentRepo } = github.context.repo;
+    const owner = currentOwner;
+    const repo = currentRepo;
 
     // Determine content-length for header to upload asset
     const contentLength =  ( filePath: string ) => fs.statSync(filePath).size;
@@ -16,11 +20,14 @@ export async function uploadReleaseAsset(uploadUrl: string, assetPath: string, a
     // Upload a release asset
     // API Documentation: https://developer.github.com/v3/repos/releases/#upload-a-release-asset
     // Octokit Documentation: https://octokit.github.io/rest.js/#octokit-routes-repos-upload-release-asset
-    const uploadAssetResponse = await github.repos.uploadReleaseAsset({
-      url: uploadUrl,
+    const uploadAssetResponse = await octokit.repos.uploadReleaseAsset({
+      data: fs.readFileSync(assetPath),
       headers,
       name: assetName,
-      file: fs.readFileSync(assetPath)
+      url: uploadUrl,
+      owner: currentOwner,
+      repo: currentRepo,
+      release_id: releaseId
     });
 
     // Get the browser_download_url for the uploaded release asset from the response

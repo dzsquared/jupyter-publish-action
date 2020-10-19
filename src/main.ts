@@ -11,7 +11,8 @@ async function run(): Promise<void> {
     const bookName: string = core.getInput('bookname');
     const versionNumber: string = core.getInput('versionnumber');
     const languageId: string = core.getInput('languageid');
-    const releaseName = core.getInput('releasename', { required: true });
+    const releaseName: string = core.getInput('releasename', { required: true });
+    const gitHubToken: string  = core.getInput('githubtoken', { required: true });
 
     // setup 7zip
     const pathTo7zip = sevenBin.path7za;
@@ -36,19 +37,19 @@ async function run(): Promise<void> {
 
     // create release
     // https://github.com/actions/create-release
-    let newRelease = await createRelease(tagName, releaseName);
+    let newRelease = await createRelease(tagName, releaseName, gitHubToken);
     if (newRelease) {
       let uploadUrl = newRelease.uploadUrl;
 
       // upload zip
       const zipFile = bookDirectory + 'jupyterbook.zip';
       const zipName = bookName + '-' + versionNumber + '-' + languageId + '.zip';
-      await uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip');
+      await uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip', newRelease.releaseId, gitHubToken);
 
       // upload tar
       const tarFile = bookDirectory + 'jupyterbook.tar.gz';
       const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
-      await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar');
+      await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
 
       core.setOutput('releaseUrl',newRelease.htmlUrl);
     } else {

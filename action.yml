@@ -23,6 +23,9 @@ inputs:
     description: 'Language id'
     default: 'EN'
     required: true
+  githubtoken:
+    description: 'GitHub token for action context'
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'
