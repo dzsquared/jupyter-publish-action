@@ -1757,8 +1757,7 @@ function run() {
             console.log(bookDirectoryContent);
             const createZip = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
                 const zipStream = node_7z_1.default.add('jupyterbook.zip', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
-                    recursive: true,
-                    excludeArchiveType: 'zip'
+                    recursive: true
                 });
                 yield new Promise((resolve, reject) => {
                     zipStream.on('end', () => {
@@ -1774,8 +1773,7 @@ function run() {
             console.log('zipped');
             const createTar = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
                 const tarStream = node_7z_1.default.add('jupyterbook.tar.gz', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
-                    recursive: true,
-                    excludeArchiveType: 'tar'
+                    recursive: true
                 });
                 yield new Promise((resolve, reject) => {
                     tarStream.on('end', () => {

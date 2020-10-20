@@ -22,7 +22,6 @@ async function run(): Promise<void> {
     const createZip = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
       const zipStream = Seven.add('jupyterbook.zip', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], { 
         recursive: true
-        , excludeArchiveType : 'zip'
       });
       
       await new Promise((resolve, reject) => {
@@ -41,7 +40,6 @@ async function run(): Promise<void> {
     const createTar = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
       const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
         recursive: true
-        , excludeArchiveType : 'tar'
       });
       await new Promise((resolve, reject) => {
         tarStream.on('end', () => {
