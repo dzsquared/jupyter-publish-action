@@ -1,108 +1,89 @@
+# Create a Remote Jupyter Book Release
+
+Use this action to create a GitHub release for your Jupyter book, quickly making it accessible as a remote Jupyter book in Azure Data Studio.
+
 <p align="center">
   <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
 </p>
 
-# Create a JavaScript Action using TypeScript
 
-Use this template to bootstrap the creation of a TypeScript action.:rocket:
+## Usage
 
-This template includes compilation support, tests, a validation workflow, publishing, and versioning guidance.  
+### Manual Start from Workflow Form
+In its simplest form, this action can be manually triggered in the browser on the Actions tab for a repository.
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+![workflow form with inputs](/images/workflowForm.png)
 
-## Create an action from this template
+To setup the workflow for a manual trigger, create a new GitHub Action workflow and replace the workflow with the following:
 
-Click the `Use this Template` and provide the new repo details for your action
+```yml
+# This is a basic workflow that is manually triggered
+name: Remote Jupyter Book
 
-## Code in Main
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      directory:
+        description: 'Jupyter Book to Release (defaults to whole repository)'
+        default: '.'
+        required: true
+      releasename:
+        description: 'Release name'
+        required: true
+      bookname:
+        description: 'Book name'
+        required: true
+      versionnumber:
+        description: 'Version number'
+        required: true
+      languageid:
+        description: 'Language id'
+        default: 'EN'
+        required: true
 
-Install the dependencies  
-```bash
-$ npm install
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  RemoteBook:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Publish book
+        uses: dzsquared/jupyter-publish-action@v0.0.22
+        with:
+          directory: ${{ github.event.inputs.directory }}
+          releasename:  ${{ github.event.inputs.releasename }}
+          bookname: ${{ github.event.inputs.bookname }}
+          versionnumber: ${{ github.event.inputs.versionnumber }}
+          languageid: ${{ github.event.inputs.languageid }}
+          githubtoken: ${{ secrets.GITHUB_TOKEN }}
+
 ```
 
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run package
-```
+### Other Uses
 
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
-
-```yaml
-uses: ./
-with:
-  milliseconds: 1000
-```
-
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
-
-## Usage:
-
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+The action can be used with other triggers, provided that the inputs are obtained or statically set.  I'd love to hear how this is used, please feel free to open an issue just to share your scenario!
 
 
+## Inputs
 
-https://github.com/actions/create-release
+### `directory`
+This input defaults to `.`, or the root of the repository.  If the folders for the Jupyter book, such as `content` and `_data`, are nested within the repository, change this value to their location.  Changing this value is not a typical scenario for a repository with a single Jupyter book.
 
+### Azure Data Studio fields
+![Azure Data Studio remote book dialog](images/remoteBook.png)
+- `releasename` = Releases
+- `bookname` = Book
+- `versionnumber` = Version
+- `languageid` = Language
+
+
+### `githubtoken`
+This is a token specific to the repository and the action runtime.  You do not need to generate a token or do anything but put the value `${{ secrets.GITHUB_TOKEN }}`.
+
+## Release Notes
+
+### v0.0.1-0.0.22
+Testing and developing in the open.  It was messy, but it got us here.

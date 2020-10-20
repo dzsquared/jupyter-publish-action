@@ -1,6 +1,6 @@
 {
   "name": "jupyter-publish-action",
-  "version": "0.0.1",
+  "version": "0.0.23",
   "private": true,
   "description": "Remote Jupyter book publish template action",
   "main": "lib/main.js",
@@ -22,7 +22,7 @@
     "node",
     "setup"
   ],
-  "author": "",
+  "author": "drewsk",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.6",

@@ -1733,14 +1733,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(186));
-const node_7z_1 = __importDefault(__webpack_require__(920));
 const create_release_1 = __webpack_require__(671);
 const upload_release_asset_1 = __webpack_require__(307);
+const create_release_assets_1 = __webpack_require__(159);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -1750,63 +1747,10 @@ function run() {
             const languageId = core.getInput('languageid');
             const releaseName = core.getInput('releasename', { required: true });
             const gitHubToken = core.getInput('githubtoken', { required: true });
-            // setup 7zip
-            const bookDirectoryContent = bookDirectory + '/content/';
-            const bookDirectoryData = bookDirectory + '/_data/';
-            const bookDirectoryConfig = bookDirectory + '/_config.yml';
-            console.log(bookDirectoryContent);
-            const createZip = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
-                const zipStream = node_7z_1.default.add('jupyterbook.zip', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
-                    recursive: true
-                });
-                yield new Promise((resolve, reject) => {
-                    zipStream.on('end', () => {
-                        resolve();
-                    });
-                    zipStream.on('error', (err) => {
-                        console.log(err);
-                        reject(err.stderr);
-                    });
-                });
-            });
-            yield createZip(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
-            console.log('zipped');
-            const createTar = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
-                const tarStream = node_7z_1.default.add('jupyterbook.tar', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
-                    recursive: true
-                });
-                yield new Promise((resolve, reject) => {
-                    tarStream.on('end', () => {
-                        resolve();
-                    });
-                    tarStream.on('error', (err) => {
-                        console.log(err);
-                        reject(err.stderr);
-                    });
-                });
-            });
-            yield createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
-            console.log('tarred');
-            const createGz = () => __awaiter(this, void 0, void 0, function* () {
-                const gzStream = node_7z_1.default.add('jupyterbook.tar.gz', './jupyterbook.tar', {});
-                yield new Promise((resolve, reject) => {
-                    gzStream.on('end', () => {
-                        resolve();
-                    });
-                    gzStream.on('error', (err) => {
-                        console.log(err);
-                        reject(err.stderr);
-                    });
-                });
-            });
-            yield createGz();
-            console.log('gzed');
-            // get datestring
-            const tagName = new Date().toISOString().replace(/[.Z:-]/g, '');
-            console.log(tagName);
+            // create zip and targz of jupyter book
+            yield create_release_assets_1.createReleaseAssets(bookDirectory);
             // create release
-            // https://github.com/actions/create-release
-            let newRelease = yield create_release_1.createRelease(tagName, releaseName, gitHubToken);
+            let newRelease = yield create_release_1.createRelease(releaseName, gitHubToken);
             console.log(newRelease);
             if (newRelease) {
                 let uploadUrl = newRelease.uploadUrl;
@@ -1821,7 +1765,6 @@ function run() {
                 core.setOutput('releaseUrl', newRelease.htmlUrl);
             }
             else {
-                core.error('Failed to create release.');
                 core.setFailed('Failed to create release.');
             }
         }
@@ -2496,6 +2439,86 @@ module.exports = isEmpty;
 
 /***/ }),
 
+/***/ 159:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createReleaseAssets = void 0;
+const node_7z_1 = __importDefault(__webpack_require__(920));
+function createReleaseAssets(bookDirectory) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // setup 7zip
+        const bookDirectoryContent = bookDirectory + '/content/';
+        const bookDirectoryData = bookDirectory + '/_data/';
+        const bookDirectoryConfig = bookDirectory + '/_config.yml';
+        console.log(bookDirectoryContent);
+        const createZip = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
+            const zipStream = node_7z_1.default.add('jupyterbook.zip', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
+                recursive: true
+            });
+            yield new Promise((resolve, reject) => {
+                zipStream.on('end', () => {
+                    resolve();
+                });
+                zipStream.on('error', (err) => {
+                    console.log(err);
+                    reject(err.stderr);
+                });
+            });
+        });
+        yield createZip(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
+        console.log('zipped');
+        const createTar = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
+            const tarStream = node_7z_1.default.add('jupyterbook.tar', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
+                recursive: true
+            });
+            yield new Promise((resolve, reject) => {
+                tarStream.on('end', () => {
+                    resolve();
+                });
+                tarStream.on('error', (err) => {
+                    console.log(err);
+                    reject(err.stderr);
+                });
+            });
+        });
+        yield createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
+        console.log('tarred');
+        const createGz = () => __awaiter(this, void 0, void 0, function* () {
+            const gzStream = node_7z_1.default.add('jupyterbook.tar.gz', './jupyterbook.tar', {});
+            yield new Promise((resolve, reject) => {
+                gzStream.on('end', () => {
+                    resolve();
+                });
+                gzStream.on('error', (err) => {
+                    console.log(err);
+                    reject(err.stderr);
+                });
+            });
+        });
+        yield createGz();
+        console.log('gzed');
+    });
+}
+exports.createReleaseAssets = createReleaseAssets;
+
+
+/***/ }),
+
 /***/ 174:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -3153,7 +3176,7 @@ var net = __webpack_require__(631);
 var tls = __webpack_require__(16);
 var http = __webpack_require__(605);
 var https = __webpack_require__(211);
-var events = __webpack_require__(759);
+var events = __webpack_require__(614);
 var assert = __webpack_require__(357);
 var util = __webpack_require__(669);
 
@@ -5529,7 +5552,7 @@ exports.getUserAgent = getUserAgent;
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-const normalizePath = __webpack_require__(614)
+const normalizePath = __webpack_require__(756)
 const { INFOS, BODY_PROGRESS, BODY_SYMBOL_FILE, BODY_HASH, INFOS_SPLIT, END_OF_STAGE_HYPHEN } = __webpack_require__(22)
 const { SYMBOL_OPERATIONS } = __webpack_require__(796)
 
@@ -8293,42 +8316,7 @@ module.exports = require("http");
 /***/ 614:
 /***/ (function(module) {
 
-/*!
- * normalize-path <https://github.com/jonschlinkert/normalize-path>
- *
- * Copyright (c) 2014-2018, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-module.exports = function(path, stripTrailing) {
-  if (typeof path !== 'string') {
-    throw new TypeError('expected path to be a string');
-  }
-
-  if (path === '\\' || path === '/') return '/';
-
-  var len = path.length;
-  if (len <= 1) return path;
-
-  // ensure that win32 namespaces has two leading slashes, so that the path is
-  // handled properly by the win32 version of path.parse() after being normalized
-  // https://msdn.microsoft.com/library/windows/desktop/aa365247(v=vs.85).aspx#namespaces
-  var prefix = '';
-  if (len > 4 && path[3] === '\\') {
-    var ch = path[2];
-    if ((ch === '?' || ch === '.') && path.slice(0, 2) === '\\\\') {
-      path = path.slice(2);
-      prefix = '//';
-    }
-  }
-
-  var segs = path.split(/[/\\]+/);
-  if (stripTrailing !== false && segs[segs.length - 1] === '') {
-    segs.pop();
-  }
-  return prefix + segs.join('/');
-};
-
+module.exports = require("events");
 
 /***/ }),
 
@@ -8694,17 +8682,15 @@ exports.releaseInfo = exports.createRelease = void 0;
 const core_1 = __importDefault(__webpack_require__(186));
 const github = __importStar(__webpack_require__(438));
 const fs_1 = __importDefault(__webpack_require__(747));
-function createRelease(tagName, release_name, gitHubToken) {
+function createRelease(release_name, gitHubToken) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-            // const github = new GitHub(process.env.GITHUB_TOKEN);
+            // get datestring
+            const tagName = new Date().toISOString().replace(/[.Z:-]/g, '');
+            console.log(tagName);
             // Get owner and repo from context of payload that triggered the action
             const { owner: currentOwner, repo: currentRepo } = github.context.repo;
             const octokit = github.getOctokit(gitHubToken);
-            // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-            // const tagName = core.getInput('tag_name', { required: true });
-            // This removes the 'refs/tags' portion of the string, i.e. from 'refs/tags/v1.10.15' to 'v1.10.15'
             const tag = tagName.replace('refs/tags/', '');
             const releaseName = release_name.replace('refs/tags/', '');
             const body = "";
@@ -8742,13 +8728,8 @@ function createRelease(tagName, release_name, gitHubToken) {
             return new Promise((resolve) => {
                 resolve(releaseReturn);
             });
-            // Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-            // core.setOutput('id', releaseId);
-            // core.setOutput('html_url', htmlUrl);
-            // core.setOutput('upload_url', uploadUrl);
         }
         catch (error) {
-            // return undefined;
             return new Promise((reject) => {
                 reject(error.message);
             });
@@ -8951,10 +8932,45 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ 759:
+/***/ 756:
 /***/ (function(module) {
 
-module.exports = require("events");
+/*!
+ * normalize-path <https://github.com/jonschlinkert/normalize-path>
+ *
+ * Copyright (c) 2014-2018, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+module.exports = function(path, stripTrailing) {
+  if (typeof path !== 'string') {
+    throw new TypeError('expected path to be a string');
+  }
+
+  if (path === '\\' || path === '/') return '/';
+
+  var len = path.length;
+  if (len <= 1) return path;
+
+  // ensure that win32 namespaces has two leading slashes, so that the path is
+  // handled properly by the win32 version of path.parse() after being normalized
+  // https://msdn.microsoft.com/library/windows/desktop/aa365247(v=vs.85).aspx#namespaces
+  var prefix = '';
+  if (len > 4 && path[3] === '\\') {
+    var ch = path[2];
+    if ((ch === '?' || ch === '.') && path.slice(0, 2) === '\\\\') {
+      path = path.slice(2);
+      prefix = '//';
+    }
+  }
+
+  var segs = path.split(/[/\\]+/);
+  if (stripTrailing !== false && segs[segs.length - 1] === '') {
+    segs.pop();
+  }
+  return prefix + segs.join('/');
+};
+
 
 /***/ }),
 

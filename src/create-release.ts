@@ -4,19 +4,17 @@ import { rejects } from 'assert';
 import fs from 'fs';
 
 
-export async function createRelease( tagName: string, release_name: string, gitHubToken: string ): Promise<releaseInfo> {
+export async function createRelease(release_name: string, gitHubToken: string ): Promise<releaseInfo> {
   try {
-    // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
-    // const github = new GitHub(process.env.GITHUB_TOKEN);
+    // get datestring
+    const tagName: string = new Date().toISOString().replace(/[.Z:-]/g, '');
+    console.log(tagName);
 
     // Get owner and repo from context of payload that triggered the action
     const { owner: currentOwner, repo: currentRepo } = github.context.repo;
     const octokit = github.getOctokit(gitHubToken);
 
-    // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-    // const tagName = core.getInput('tag_name', { required: true });
 
-    // This removes the 'refs/tags' portion of the string, i.e. from 'refs/tags/v1.10.15' to 'v1.10.15'
     const tag: string = tagName.replace('refs/tags/', '');
     const releaseName: string = release_name.replace('refs/tags/', '');
     const body: string = "";
@@ -60,13 +58,7 @@ export async function createRelease( tagName: string, release_name: string, gitH
       resolve(releaseReturn);
     });
 
-    // Set the output variables for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-    // core.setOutput('id', releaseId);
-    // core.setOutput('html_url', htmlUrl);
-    // core.setOutput('upload_url', uploadUrl);
-   
   } catch (error)  {
-    // return undefined;
     return new Promise<releaseInfo>((reject) => {
       reject(error.message);
     });
