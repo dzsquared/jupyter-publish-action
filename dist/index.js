@@ -1753,7 +1753,7 @@ function run() {
             // setup 7zip
             const bookDirectoryContent = bookDirectory + '/content/';
             const bookDirectoryData = bookDirectory + '/_data/';
-            const bookDirectoryConfig = bookDirectory + '_config.yml';
+            const bookDirectoryConfig = bookDirectory + '/_config.yml';
             console.log(bookDirectoryContent);
             const createZip = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
                 const zipStream = node_7z_1.default.add('jupyterbook.zip', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
@@ -1771,22 +1771,36 @@ function run() {
             });
             yield createZip(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
             console.log('zipped');
-            // const createTar = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
-            //   const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
-            //     recursive: true
-            //   });
-            //   await new Promise((resolve, reject) => {
-            //     tarStream.on('end', () => {
-            //       resolve();
-            //     });
-            //     tarStream.on('error', (err: any) => {
-            //       console.log(err);
-            //       reject(err.stderr);
-            //     })
-            //   })
-            // };
-            // await createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
-            // console.log('tarred');
+            const createTar = (bookDirectoryContent, bookDirectoryData, bookDirectoryConfig) => __awaiter(this, void 0, void 0, function* () {
+                const tarStream = node_7z_1.default.add('jupyterbook.tar', [bookDirectoryContent, bookDirectoryData, bookDirectoryConfig], {
+                    recursive: true
+                });
+                yield new Promise((resolve, reject) => {
+                    tarStream.on('end', () => {
+                        resolve();
+                    });
+                    tarStream.on('error', (err) => {
+                        console.log(err);
+                        reject(err.stderr);
+                    });
+                });
+            });
+            yield createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
+            console.log('tarred');
+            const createGz = () => __awaiter(this, void 0, void 0, function* () {
+                const gzStream = node_7z_1.default.add('jupyterbook.tar.gz', './jupyterbook.tar', {});
+                yield new Promise((resolve, reject) => {
+                    gzStream.on('end', () => {
+                        resolve();
+                    });
+                    gzStream.on('error', (err) => {
+                        console.log(err);
+                        reject(err.stderr);
+                    });
+                });
+            });
+            yield createGz();
+            console.log('gzed');
             // get datestring
             const tagName = new Date().toISOString().replace(/[.Z:-]/g, '');
             console.log(tagName);
@@ -1797,13 +1811,13 @@ function run() {
             if (newRelease) {
                 let uploadUrl = newRelease.uploadUrl;
                 // upload zip
-                const zipFile = bookDirectory + '/jupyterbook.zip';
+                const zipFile = './jupyterbook.zip';
                 const zipName = bookName + '-' + versionNumber + '-' + languageId + '.zip';
                 yield upload_release_asset_1.uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip', newRelease.releaseId, gitHubToken);
-                // // upload tar
-                // const tarFile = bookDirectory + '/jupyterbook.tar.gz';
-                // const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
-                // await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
+                // upload targz
+                const tarFile = './jupyterbook.tar.gz';
+                const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
+                yield upload_release_asset_1.uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
                 core.setOutput('releaseUrl', newRelease.htmlUrl);
             }
             else {

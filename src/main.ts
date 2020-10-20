@@ -16,7 +16,7 @@ async function run(): Promise<void> {
     // setup 7zip
     const bookDirectoryContent: string = bookDirectory+'/content/';
     const bookDirectoryData: string = bookDirectory+'/_data/';
-    const bookDirectoryConfig: string = bookDirectory+'_config.yml';
+    const bookDirectoryConfig: string = bookDirectory+'/_config.yml';
 
     console.log(bookDirectoryContent);
     const createZip = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
@@ -37,22 +37,38 @@ async function run(): Promise<void> {
     await createZip(bookDirectoryContent,bookDirectoryData,bookDirectoryConfig);
     console.log('zipped');
 
-    // const createTar = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
-    //   const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
-    //     recursive: true
-    //   });
-    //   await new Promise((resolve, reject) => {
-    //     tarStream.on('end', () => {
-    //       resolve();
-    //     });
-    //     tarStream.on('error', (err: any) => {
-    //       console.log(err);
-    //       reject(err.stderr);
-    //     })
-    //   })
-    // };
-    // await createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
-    // console.log('tarred');
+    const createTar = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
+      const tarStream = Seven.add('jupyterbook.tar', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
+        recursive: true
+      });
+      await new Promise((resolve, reject) => {
+        tarStream.on('end', () => {
+          resolve();
+        });
+        tarStream.on('error', (err: any) => {
+          console.log(err);
+          reject(err.stderr);
+        })
+      })
+    };
+    await createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
+    console.log('tarred');
+
+    const createGz = async () => {
+      const gzStream = Seven.add('jupyterbook.tar.gz', './jupyterbook.tar', {
+      });
+      await new Promise((resolve, reject) => {
+        gzStream.on('end', () => {
+          resolve();
+        });
+        gzStream.on('error', (err: any) => {
+          console.log(err);
+          reject(err.stderr);
+        })
+      })
+    };
+    await createGz();
+    console.log('gzed');
     
     // get datestring
     const tagName: string = new Date().toISOString().replace(/[.Z:-]/g, '');
@@ -66,14 +82,14 @@ async function run(): Promise<void> {
       let uploadUrl = newRelease.uploadUrl;
 
       // upload zip
-      const zipFile = bookDirectory + '/jupyterbook.zip';
+      const zipFile = './jupyterbook.zip';
       const zipName = bookName + '-' + versionNumber + '-' + languageId + '.zip';
       await uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip', newRelease.releaseId, gitHubToken);
 
-      // // upload tar
-      // const tarFile = bookDirectory + '/jupyterbook.tar.gz';
-      // const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
-      // await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
+      // upload targz
+      const tarFile = './jupyterbook.tar.gz';
+      const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
+      await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
 
       core.setOutput('releaseUrl',newRelease.htmlUrl);
     } else {
