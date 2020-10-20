@@ -37,22 +37,22 @@ async function run(): Promise<void> {
     await createZip(bookDirectoryContent,bookDirectoryData,bookDirectoryConfig);
     console.log('zipped');
 
-    const createTar = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
-      const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
-        recursive: true
-      });
-      await new Promise((resolve, reject) => {
-        tarStream.on('end', () => {
-          resolve();
-        });
-        tarStream.on('error', (err: any) => {
-          console.log(err);
-          reject(err.stderr);
-        })
-      })
-    };
-    await createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
-    console.log('tarred');
+    // const createTar = async (bookDirectoryContent: string,bookDirectoryData: string,bookDirectoryConfig: string) => {
+    //   const tarStream = Seven.add('jupyterbook.tar.gz', [bookDirectoryContent,bookDirectoryData,bookDirectoryConfig], {
+    //     recursive: true
+    //   });
+    //   await new Promise((resolve, reject) => {
+    //     tarStream.on('end', () => {
+    //       resolve();
+    //     });
+    //     tarStream.on('error', (err: any) => {
+    //       console.log(err);
+    //       reject(err.stderr);
+    //     })
+    //   })
+    // };
+    // await createTar(bookDirectoryContent, bookDirectoryData, bookDirectoryConfig);
+    // console.log('tarred');
     
     // get datestring
     const tagName: string = new Date().toISOString().replace(/[.Z:-]/g, '');
@@ -70,10 +70,10 @@ async function run(): Promise<void> {
       const zipName = bookName + '-' + versionNumber + '-' + languageId + '.zip';
       await uploadReleaseAsset(uploadUrl, zipFile, zipName, 'application/zip', newRelease.releaseId, gitHubToken);
 
-      // upload tar
-      const tarFile = bookDirectory + '/jupyterbook.tar.gz';
-      const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
-      await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
+      // // upload tar
+      // const tarFile = bookDirectory + '/jupyterbook.tar.gz';
+      // const tarName = bookName + '-' + versionNumber + '-' + languageId + '.tar.gz';
+      // await uploadReleaseAsset(uploadUrl, tarFile, tarName, 'application/x-compressed-tar', newRelease.releaseId, gitHubToken);
 
       core.setOutput('releaseUrl',newRelease.htmlUrl);
     } else {
