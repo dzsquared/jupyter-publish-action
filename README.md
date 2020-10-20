@@ -51,7 +51,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Publish book
-        uses: dzsquared/jupyter-publish-action@v0.0.22
+        uses: dzsquared/jupyter-publish-action@v0.1.0
         with:
           directory: ${{ github.event.inputs.directory }}
           releasename:  ${{ github.event.inputs.releasename }}
@@ -84,6 +84,8 @@ This input defaults to `.`, or the root of the repository.  If the folders for t
 This is a token specific to the repository and the action runtime.  You do not need to generate a token or do anything but put the value `${{ secrets.GITHUB_TOKEN }}`.
 
 ## Release Notes
+### v0.1.0
+First preview release.
 
-### v0.0.1-0.0.22
+### v0.0.1-0.0.23
 Testing and developing in the open.  It was messy, but it got us here.

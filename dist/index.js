@@ -1742,7 +1742,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const bookDirectory = core.getInput('directory');
-            const bookName = core.getInput('bookname');
+            const bookName = core.getInput('bookname').replace(/[ ]/g, '');
             const versionNumber = core.getInput('versionnumber');
             const languageId = core.getInput('languageid');
             const releaseName = core.getInput('releasename', { required: true });

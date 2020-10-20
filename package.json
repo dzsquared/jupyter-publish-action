@@ -1,6 +1,6 @@
 {
   "name": "jupyter-publish-action",
-  "version": "0.0.23",
+  "version": "0.1.0",
   "private": true,
   "description": "Remote Jupyter book publish template action",
   "main": "lib/main.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/dzsquared/jupyter-publish-action.git"
   },
   "keywords": [
     "actions",

@@ -7,7 +7,7 @@ import { createReleaseAssets } from './create-release-assets';
 async function run(): Promise<void> {
   try {
     const bookDirectory: string = core.getInput('directory');
-    const bookName: string = core.getInput('bookname');
+    const bookName: string = core.getInput('bookname').replace(/[ ]/g,'');
     const versionNumber: string = core.getInput('versionnumber');
     const languageId: string = core.getInput('languageid');
     const releaseName: string = core.getInput('releasename', { required: true });
